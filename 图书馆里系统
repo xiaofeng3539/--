@@ -1,0 +1,139 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+#define MAX_BOOKS 100
+#define TITLE_LENGTH 50
+#define AUTHOR_LENGTH 50
+
+typedef struct{
+	char title[TITLE_LENGTH];
+	char author[AUTHOR_LENGTH];
+	int id;
+	float price;
+}Book;
+
+typedef struct{
+	Book books[MAX_BOOKS];
+	int count;
+}Library;
+
+//初始化图书馆
+void initLibrary(Library *Lib){
+	Lib->count = 0;
+}
+
+//添加图书
+void addBook(Library *Lib){
+	if(Lib->count >= MAX_BOOKS){
+		printf("图书馆已满，无法添加更多图示！\n");
+		return;
+	}
+	Book newBook;
+	printf("请输入图书ID：\n");
+	scanf("%d",&newBook.id);
+	while ((getchar()) != '\n');
+	printf("请输入图书标题：\n");
+	scanf("%[^\n]",newBook.title);
+	while ((getchar()) != '\n');
+	printf("请输入图书作者：\n");
+	scanf("%[\n]",newBook.author);
+	while ((getchar()) != '\n');
+	printf("请输入图书价格：\n");
+	scanf("%f",&newBook.price);
+	
+	
+	Lib->books[Lib->count] = newBook;
+	Lib->count++;
+	printf("图书添加成功！\n");
+	return;
+}
+
+//按ID查找图书
+void findBookByid(Library *Lib){
+	int id;
+	printf("请输入要查找的图书ID：");
+	scanf("%d",&id);
+	getchar();
+	
+	for(int i = 0;i < Lib->count;i++){
+		if(Lib->books[i].id == id){
+			printf("ID：%d\n",Lib->books[i].id);
+			printf("标题：%s\n",Lib->books[i].title);
+			printf("作者：%s\n",Lib->books[i].author);
+			printf("价格：%f",Lib->books[i].price);
+			return;
+		}
+	}
+	printf("未找到该图书：\n");
+}
+
+//显示所有图书
+void displayALLBooks(Library *Lib){
+	if(Lib->count == 0){
+		printf("图书馆暂无图书：\n");
+		return;
+	}
+	
+	printf("图书馆所有图书的信息：\n");
+	for(int i = 0;i < Lib->count;i++){
+		printf("ID：%d",Lib->books[i].id);
+		printf("标题：%s\n",Lib->books[i].title);
+		printf("作者：%s\n",Lib->books[i].author);
+		printf("价格：%.2f\n",Lib->books[i].price);
+		printf("----------------------\n");
+	}
+}
+
+int main(){
+	Library Lib;
+	initLibrary(&Lib);
+	int choice;
+	
+	do{
+		printf("\n图书管理系统\n");
+		printf("1. 添加图书\n");
+		printf("2. 查找图书\n");
+		printf("3. 显示所有图书\n");
+		printf("4. 退出\n");
+		printf("请输入你的选择：");
+		scanf("%d",&choice);
+		getchar();
+		
+		switch(choice){
+		case 1:
+			addBook(&Lib);
+			break;
+		case 2:
+			findBookByid(&Lib);
+			break;
+		case 3:
+			displayALLBooks(&Lib);
+			break;
+		case 4:
+			printf("感谢使用图书管理系统！\n");
+			break;
+		default:
+			printf("无效的选择，请重新输入！\n");
+		}
+	}while(choice!=4);
+	
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
