@@ -1,0 +1,121 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+//二叉树节点结构
+typedef struct TreeNode{
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+}TreeNode;
+
+//队列节点结构（用于层序遍历）
+typedef struct QueueNode{
+	TreeNode* data;
+	struct QueueNode *next;
+}QueueNode;
+
+//队列结构
+typedef struct Queue{
+	QueueNode *front;
+	QueueNode *rear;
+}Queue;
+
+//初始化队列
+Queue* initQueue(){
+	Queue *q = (Queue*)malloc(sizeof(Queue));
+	q->front = q->rear = NULL;
+	return q; 
+}
+
+//入队操作
+void enqueue(Queue *q,TreeNode *node){
+	QueueNode *newNode = (QueueNode*)malloc(sizeof(QueueNode));
+	newNode->data = node;
+	newNode->next = NULL;
+	
+	if(q->rear == NULL){
+		q->front = q->rear = newNode;
+	}else{
+		q->rear->next = newNode;
+		q->rear = newNode;
+	} 
+}
+
+//出队操作（返回队头节点，队列需非空）
+TreeNode* dequeue(Queue *q){
+	if(q->front == NULL) return NULL;
+	
+	QueueNode *temp = q->front;
+	TreeNode *node = temp->data;
+	q->front = q->front->next;
+	
+	if(q->front == NULL){
+		q->rear = NULL;
+	}
+	free(temp);
+	return node;
+}
+
+//判断队列是否为空
+int isQueueEmpty(Queue *q){
+	return q->front == NULL;
+}
+
+//创建二叉树节点（辅助函数，用于测试）
+TreeNode* createTreeNode(int val){
+	TreeNode *node = (TreeNode*)malloc(sizeof(TreeNode));
+	node->val = val;
+	node->left = node->right = NULL;
+	return node;
+}
+
+//层序遍历(分层遍历）
+void levelOrderTraversal(TreeNode *root){
+	if(root == NULL){
+		printf("二叉树为空!\n");
+		return;
+	}
+	
+	Queue *q = initQueue();
+	enqueue(q,root);
+	
+	while(!isQueueEmpty(q)){
+		int levelSize = 0;
+		QueueNode *cur = q->front;
+		
+		// 1.获取当前层数节点
+		while(cur != NULL){
+			levelSize++;
+			cur = cur->next;
+		}
+		
+		// 2.遍历当前节点，同时将节点入队
+		for(int i = 0;i < levelSize;i++){
+			TreeNode *node = dequeue(q);
+			if(node == NULL){
+				printf("NULL\t");              //空节点占位
+				continue;
+			}
+			printf("%d\t",node->val);          //打印当前节点
+			
+			//子节点入队（不管是否为NULL，保证分层逻辑）
+			enqueue(q,node->left);
+			enqueue(q,node->right);
+		}
+		printf("\n");   //每层结束换行	
+	}
+	free(q);
+}
+
+int main(){
+	//手动构建测试二叉树
+	TreeNode *root = createTreeNode(3);
+	root->left = createTreeNode(9);
+	root->right = createTreeNode(20);
+	root->right->left = createTreeNode(15);
+	root->right->right = createTreeNode(7);
+	
+	printf("二叉树层序遍历（分层打印）结构：\n");
+	levelOrderTraversal(root);
+	return 0;
+}
