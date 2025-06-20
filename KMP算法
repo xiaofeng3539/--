@@ -1,0 +1,85 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+//构建部分匹配表（next数组）
+void bulidNext(const char* pattern,int* next,int patternLen){
+	next[0] = -1;
+	int i = 0,j = -1;
+	
+	while(i < patternLen -1){
+		if(j == -1 || pattern[i] == pattern[j]){
+			i++;
+			j++;
+			//优化next数组：如果当前字符串匹配失败，直接跳转到更短的前缀
+			if(pattern[i] == pattern[j]){
+				next[i] = next[j];
+			}else{
+				next[i] = j;
+			}	
+		}else{
+			j = next[j]; //回退到上一个前缀位置
+		}
+	}
+}
+
+//KMP字符串匹配算法
+int kmpSearch(const char* text,const char* pattern){
+	int textLen = strlen(text);
+	int patternLen = strlen(pattern);
+	
+	//边界处理情况
+	if(pattern == 0) return 0;
+	if(textLen < patternLen) return -1;
+	
+	//分配next数组内容
+	int *next = (int*)malloc(sizeof(int) * patternLen);
+	if(next == NULL){
+		printf("内存分配失败\n");
+		return -1;
+	}
+	
+	//构建next数组
+	bulidNext(pattern,next,patternLen);
+	
+	//kmp匹配过程
+	int i = 0,j = 0;
+	while(i < textLen && j < patternLen){
+		if(j == -1 || text[i] == pattern[j]){
+			i++;
+			j++;
+		}else{  
+			j = next[j];         //利用next数组回退
+		}
+	}
+	
+	//释放内存
+	free(next);
+	
+	//匹配成功返回起始位置，失败返回-1
+	if(j == patternLen){
+		return i-j;
+	}else{
+		return -1;
+	}	
+}
+
+//测试函数
+int main(){
+	char text[100],pattern[1000];
+	
+	printf("请输入文本字符串：");
+	scanf("%s",text);
+	
+	printf("请输入要查找的模式串：");
+	scanf("%s",pattern);
+	
+	int position = kmpSearch(text,pattern);
+	
+	if(position != -1){
+		printf("模式串在文本中的起始位置是：%d\n",position);
+	}else{
+		printf("未找到匹配的模式串\n");
+	}
+	return 0;
+}
